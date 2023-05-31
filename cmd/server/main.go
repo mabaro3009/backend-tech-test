@@ -4,23 +4,35 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
+
+	"reby/api"
+	"reby/api/handlers"
+	"reby/app/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-
-	"reby/app"
 )
 
-const httpPort = 8080
-
 func main() {
+	conf := config.Get()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(api.JSONResponseMiddleware)
+	r.Use(api.RecovererMiddleware)
+	h := handlers.InitHandlers(conf)
 
-	r.Post("/rides", app.RideStartHandler)
-	r.Post("/rides/{id}/finish", app.RideFinishHandler)
+	handlers.AddRideEndpoints(r, h.Ride)
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), r); err != http.ErrServerClosed && err != nil {
+	server := &http.Server{
+		ReadTimeout:       3 * time.Second,
+		WriteTimeout:      6 * time.Second,
+		Addr:              fmt.Sprintf("%s:%s", conf.APIURL, conf.APIPort),
+		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           r,
+	}
+
+	if err := server.ListenAndServe(); err != http.ErrServerClosed && err != nil {
 		log.Fatalf("Error starting http server <%s>", err)
 	}
 }

@@ -1,0 +1,23 @@
+run:
+  deadline: 2m
+  issues-exit-code: 1
+
+linters:
+  enable:
+    - bodyclose
+    - errorlint
+    - forbidigo
+    - goconst
+    - gofmt
+    - gocognit
+    - gocyclo
+    - gosec
+    - revive
+    - staticcheck
+    - stylecheck
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  gocognit:
+    min-complexity: 15

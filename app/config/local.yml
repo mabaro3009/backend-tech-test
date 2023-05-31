@@ -1,0 +1,4 @@
+api_url: "localhost"
+api_port: "8080"
+db_type: "MEMORY"
+env: "LOCAL"
